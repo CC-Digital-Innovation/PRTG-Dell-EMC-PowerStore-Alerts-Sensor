@@ -25,7 +25,7 @@ This PowerShell script monitors Dell PowerStore storage systems for unacknowledg
 ## Installation
 1. Clone this repository or download the `PowerStore-Alert-PRTG-Sensor.ps1` file
 2. Place the script in your PRTG Custom Sensors directory, typically:
-   `C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXE`
+   `C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML`
 
 ## Usage
 In PRTG, create a new sensor using the "EXE/Script Advanced" sensor type. Add PowerStore account to the Windows Credentials section for the device in PRTG. Use the following parameters:
