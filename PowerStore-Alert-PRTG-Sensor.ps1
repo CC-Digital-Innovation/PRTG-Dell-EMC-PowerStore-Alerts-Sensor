@@ -77,23 +77,22 @@ try {
     $response = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
 
     # Filter for unacknowledged alerts and ensure we always have an array
-    # Use @() to force array context
     $unackAlerts = @($response | Where-Object { $_.is_acknowledged -eq $false })
     $alertCount = $unackAlerts.Count
 
     # Build message with descriptions
     $message = ""
     if ($alertCount -gt 0) {
-        $message = "ERROR: Found $alertCount unacknowledged alert(s):`n"
+        $message = "Found $alertCount unacknowledged alert(s):`n"
         foreach ($alert in $unackAlerts) {
             $severity = $alert.severity_l10n
             $message += "[$severity] $($alert.description_l10n)`n"
         }
     } else {
-        $message = "OK: No unacknowledged alerts"
+        $message = "No unacknowledged alerts"
     }
 
-    # Format output for PRTG
+    # Format output for PRTG - with default error threshold
     $output = @{
         prtg = @{
             result = @(
@@ -101,25 +100,24 @@ try {
                     channel = "Unacknowledged Alerts"
                     value = $alertCount
                     unit = "Count"
+                    customunit = "Alerts"
+                    showChart = 1
+                    showTable = 1
+                    limitmode = 1             # Enable limits
+                    limitmaxerror = 0         # Error if value > 0
+                    limitmaxerror_msg = "There are unacknowledged alerts that require attention"
                 }
             )
             text = $message
-            error = if ($alertCount -gt 0) { 1 } else { 0 }
         }
     }
 
     # Output JSON
     $output | ConvertTo-Json -Depth 5
-    
-    # Exit with error if there are unacknowledged alerts
-    if ($alertCount -gt 0) {
-        exit 2  # Error state in PRTG
-    } else {
-        exit 0  # OK state in PRTG
-    }
+    exit 0  # Always exit with OK state, let PRTG handle thresholds
 }
 catch {
-    # Error output for PRTG
+    # Error output for PRTG - only used for actual script/connection errors
     @{
         prtg = @{
             error = 1
