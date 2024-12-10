@@ -76,8 +76,9 @@ try {
     $uri = "https://$PowerStoreIP/api/rest/alert?select=*"
     $response = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
 
-    # Filter for unacknowledged alerts
-    $unackAlerts = $response | Where-Object { $_.is_acknowledged -eq $false }
+    # Filter for unacknowledged alerts and ensure we always have an array
+    # Use @() to force array context
+    $unackAlerts = @($response | Where-Object { $_.is_acknowledged -eq $false })
     $alertCount = $unackAlerts.Count
 
     # Build message with descriptions
